@@ -1,0 +1,4 @@
+openai>=1.40
+pandas>=2.0
+tenacity>=8.2
+tqdm>=4.66
