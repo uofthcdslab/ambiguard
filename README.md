@@ -1,18 +1,23 @@
-# Ambiguard
+# AmbiGuard
 
-[![Open the sandbox](https://img.shields.io/badge/open-uofthcdslab.github.io%2Fambiguard-1f6feb?style=for-the-badge)](https://uofthcdslab.github.io/ambiguard/)
+[![Open the sandbox](https://img.shields.io/badge/open-uofthcdslab.github.io%2FAmbiGuard-1f6feb?style=for-the-badge)](https://uofthcdslab.github.io/AmbiGuard/)
+[![Launch AmbiGuard](https://img.shields.io/badge/Launch-AmbiGuard_Sandbox-7b2cbf?style=flat&logo=github)](https://uofthcdslab.github.io/AmbiGuard/)
 
-Ambiguard is a sandbox aimed to support reflective evaluation of AI safety guardrails. It is a research prototype designed to invoke practitioners' reasoning and provoke reconsideration of what guardrail evaluation is taken to be.
+AmbiGuard is a sandbox aimed to support reflective evaluation of AI safety guardrails. It is a research prototype designed to invoke practitioners' reasoning and provoke reconsideration of what guardrail evaluation is taken to be.
 
 Guardrail models are evaluated as if safety labels are determinate. Many are
-contested judgments that rely on unstated assumptions. Ambiguard reconstructs a
+contested judgments that rely on unstated assumptions. AmbiGuard reconstructs a
 guardrail's verdict as a defeasible argument, surfaces the assumption that would
 make the opposite verdict reasonable, and re-runs the guard to show how it
 behaves.
 
+<p align="center">
+  <img src="public/logo.png" alt="AmbiGuard" width="800">
+</p>
+
 ## How it works
 
-The core idea behind Ambiguard is that every prediction of a guardrail model can be treated as the conclusion of an implicit argument, and that argument *needs* an unstated assumption to get from the input to the prediction
+The core idea behind AmbiGuard is that every prediction of a guardrail model can be treated as the conclusion of an implicit argument, and that argument *needs* an unstated assumption to get from the input to the prediction
 
 Different readers can reasonably reconstruct different assumptions from the same
 text. The sandbox displays the implicit assumptions identified by two different reasoning models, following philosopher Ennis (1982)'s
@@ -33,7 +38,7 @@ For each instance, with guard **G** and a reasoning model **R**:
 
 ## Three views
 
-Given an evaluation data and guardrail model, Ambiguard displays three views:
+Given an evaluation data and guardrail model, AmbiGuard displays three views:
 
 **Aggregate** — the guard's decision on each instance, with the standard aggregate scores.
 
@@ -53,7 +58,7 @@ npm run dev
 
 ### Precomputed results
 
-Ambiguard is used as a study instrument to understand how AI practitioners reason about guardrail evaluation. 
+AmbiGuard is used as a study instrument to understand how AI practitioners reason about guardrail evaluation. 
 For the purpose of the study, sample results are computed offline and committed as JSON, so the sandbox loads
 instantly and does not depend on an API during a session.
 
