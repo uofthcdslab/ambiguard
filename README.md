@@ -11,7 +11,7 @@ make the opposite verdict reasonable, and re-runs the guard to show how it
 behaves.
 
 <p align="center">
-  <img src="public/logo.png" alt="AmbiGuard" width="800">
+  <img src="public/logo.png" alt="AmbiGuard" width="400">
 </p>
 
 ## How it works
