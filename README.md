@@ -1,120 +1,97 @@
-# Ambiguity in Guardrails
+# Ambiguard
 
-A sandbox for reflective guardrail evaluation. Two views over the same eval set and
-the same guard: **Standard** (thresholds and aggregate metrics) and **Ambiguity**
-(the same instances split by whether the label survives a plausible rereading).
+[![Open the sandbox](https://img.shields.io/badge/open-uofthcdslab.github.io%2Fambiguard-1f6feb?style=for-the-badge)](https://uofthcdslab.github.io/ambiguard/)
 
-Static site. No server, no database. Precomputed model output is committed to the
-repo and loaded as JSON.
+Ambiguard is a sandbox aimed to support reflective evaluation of AI safety guardrails. It is a research prototype designed to invoke practitioners' reasoning and provoke reconsideration of what guardrail evaluation is taken to be.
 
-## What is where
+Guardrail models are evaluated as if safety labels are determinate. Many are
+contested judgments that rely on unstated assumptions. Ambiguard reconstructs a
+guardrail's verdict as a defeasible argument, surfaces the assumption that would
+make the opposite verdict reasonable, and re-runs the guard to show how it
+behaves.
 
-```
-public/data/sample.csv        the built-in eval set (3 columns)
-public/precomputed/           one JSON per instance + index.json
-scripts/run_precompute.py     offline pipeline; also the pilot harness
-scripts/make_fixtures.py      writes PLACEHOLDER records so the UI renders
-scripts/prompts.py            mirror of src/lib/prompts.js
-src/config.js                 models, prompt version, level definitions
-src/lib/cache.js              cache key + lookup (must match run_precompute.py)
-src/lib/pipeline.js           live path for participant-entered instances
-```
+## How it works
 
-## The records currently in the repo are placeholders
+The core idea behind Ambiguard is that every prediction of a guardrail model can be treated as the conclusion of an implicit argument, and that argument *needs* an unstated assumption to get from the input to the prediction
 
-`public/precomputed/` ships hand-written fixtures so the interface has something to
-render before you have run anything. They are marked `"fixture": true` and the app
-shows a warning banner whenever one is on screen. **Replace them before a session.**
+Different readers can reasonably reconstruct different assumptions from the same
+text. The sandbox displays the implicit assumptions identified by two different reasoning models, following philosopher Ennis (1982)'s
+work on assumptions and informal reasoning. The prompts are in `scripts/prompts.py`. 
 
-## Run it locally
+What the sandbox analyses is not which assumption is correct, but how a guardrail's prediction behaves once
+one plausible assumption and its most plausible opposing view are made explicit.
 
-Requires Node 22.12 or newer (`node --version` to check).
+For each instance, with guard **G** and a reasoning model **R**:
+
+1. G classifies the instance as safe or unsafe. That verdict is the prediction.
+2. R reconstructs the assumption the prediction rests on, and writes it into the
+   instance.
+3. G is re-run on that injection to examine its behavior under explicit articulation of a plausible assumption.
+4. R looks for the most plausible assumption under which the opposite verdict
+   becomes reasonable. If none clears the bar as per Ennis (1982), the instance is *robustly* safe or unsafe.
+5. G is re-run on that injection to examine its behavior under explicit articulation of an opposing assumption.
+
+## Three views
+
+Given an evaluation data and guardrail model, Ambiguard displays three views:
+
+**Aggregate** — the guard's decision on each instance, with the standard aggregate scores.
+
+**Assumptions** — the same instances, each marked by whether the guard's call holds up once a plausible opposing assumption is made explicit.
+
+**Divergence** — the same instances under two settings side by side: two reasoning models on one guard, or two guards under one reasoning model.
+
+## How to run it locally
+
+Node 22.12 or newer.
 
 ```bash
 npm install
 npm run dev
 ```
+`base` in `vite.config.js` must match the repository name.
 
-Open the URL it prints (usually http://localhost:5173/ambiguity-sandbox/).
+### Precomputed results
 
-## Deploy to GitHub Pages
-
-1. Create a repo under the lab account. If you do not name it `ambiguity-sandbox`,
-   change `base` in `vite.config.js` to `'/<your-repo-name>/'` — the site will load
-   a blank page otherwise.
-2. Push this directory to `main`.
-3. Repo → Settings → Pages → Build and deployment → Source: **GitHub Actions**.
-4. The workflow in `.github/workflows/deploy.yml` runs on every push to `main`.
-   Watch it under the Actions tab; the URL appears there when it finishes.
-
-## Replace the placeholders with real output
+Ambiguard is used as a study instrument to understand how AI practitioners reason about guardrail evaluation. 
+For the purpose of the study, sample results are computed offline and committed as JSON, so the sandbox loads
+instantly and does not depend on an API during a session.
 
 ```bash
 pip install -r scripts/requirements.txt
 export OPENROUTER_API_KEY=sk-or-...
-rm public/precomputed/*.json
 python scripts/run_precompute.py
-git add public/precomputed && git commit -m "precompute: <guard>, prompts v1" && git push
 ```
 
-The summary it prints is the pilot readout. Three things to look at:
+Guard, reasoning model, and prompt version are set at the top of that file. All
+three are part of the cache key, so changing any of them produces a separate set
+of records rather than overwriting the old ones. `SKIP_EXISTING` leaves anything
+already computed alone.
 
-- **level split** — if `robustly_*` never fires, Prompt 2's plausibility bar is too
-  low and every instance will look contested.
-- **inconsistent** — how often the guard also moved on the *supporting* injection.
-  Movement on both arms is added-text sensitivity, not a response to content.
-- **no logprobs** — must be 0 before the threshold slider can be made live.
+### Data
 
-## The four statistics in the Ambiguity view
+`public/data/sample.csv` has the data used for the study. It has three columns:
 
-Each line shows two numbers. Hover the "i" beside a name for the definition.
+| column | |
+|---|---|
+| `instance` | the text the guard sees |
+| `safety_type` | your own category; becomes a dropdown group |
+| `ground_truth` | `safe` or `unsafe`, optional |
 
-- **Defeasibility** — share of the guard's predictions for which a plausible
-  opposing assumption exists, split by unsafe vs. safe predictions.
-- **Correct but contestable** - of the instances where the prediction matched
-  the gold label, the share tagged contestable; and the same for the instances
-  where it did not match. Uses the level already on each record, so it costs no
-  extra model calls. Hidden entirely when the selection has no ground truth.
+Participants can also type or upload their own instances. Anything not
+precomputed can be run live in the browser, capped at five, using a key supplied
+in the interface.
 
-- **Movement** — on contestable instances, how often the verdict actually flips,
-  and the mean change in predicted probability (needs logprobs; shows a dash
-  otherwise).
-- **Consistency** — how often the verdict holds when the assumption it rests on
-  is stated explicitly. It should hold; movement here suggests the guard is
-  reacting to added text rather than content.
+### Models
 
-Both practitioner controls feed these numbers. Re-assigning a level changes which
-instances count as contestable; unticking Acknowledged treats that row as settled
-everywhere.
+Guards and reasoning models are listed in `src/config.js` and must match the ids
+in `scripts/run_precompute.py`. Guards that need a system prompt to return a bare
+label are listed in `GUARD_SYSTEM` in both files.
 
-## Turning the threshold slider on
+The threshold slider is disabled unless a guard returns token probabilities. Set
+`WANT_LOGPROBS = True`, select a provider that supports them, re-run the precompute,
+and set `logprobs: true` on that guard in `src/config.js`.
 
-The slider is visible but disabled, because none of the configured guards is known
-to return a score. To enable it:
+---
 
-1. Pick a guard and find a provider that returns logprobs for it.
-2. In `scripts/run_precompute.py` set `GUARD_PROVIDER` to that provider and
-   `WANT_LOGPROBS = True`.
-3. Re-run the precompute. Confirm the summary reports `no logprobs: 0`.
-4. In `src/config.js` set `logprobs: true` on that guard.
-
-The slider then repartitions the table and recomputes the metrics entirely in the
-browser — no API calls.
-
-## Editing the prompts
-
-`src/lib/prompts.js` and `scripts/prompts.py` must stay identical. After editing
-either, bump `PROMPT_VERSION` in **both** `src/config.js` and
-`scripts/run_precompute.py`, then re-run the precompute. The version is part of the
-cache key; without the bump the site keeps serving reconstructions built from the
-old prompt and nothing on screen says so.
-
-## API keys
-
-Participants only need a key for instances that are not precomputed (capped at 5 per
-run). The key is held in React state, is never written to browser storage, and does
-not survive a reload.
-
-For sessions where you would rather participants never see a key at all, put a
-Cloudflare Worker in front of OpenRouter, hold the key as a Worker secret, and point
-`ENDPOINT` in `src/lib/pipeline.js` at the Worker. The rest of the app is unchanged.
+**Authors** — Ramaravind Kommiya Mothilal, Shion Guha, Syed Ishtiaque Ahmed, University of Toronto. Contact ram.mothilal@mail.utoronto.ca for more information.

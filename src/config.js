@@ -11,16 +11,19 @@ export const GUARDS = [
     // pinned provider. While false, the threshold slider is disabled.
     logprobs: false,
   },
-  { id: 'meta-llama/llama-guard-3-8b', label: 'Llama Guard 3 8B', logprobs: false },
-  { id: 'google/shieldgemma-9b', label: 'ShieldGemma 9B', logprobs: false },
+  {
+    id: 'openai/gpt-oss-safeguard-20b',
+    label: 'GPT-OSS Safeguard 20B',
+    logprobs: false,
+  },
 ]
 
-export const REASONER = {
-  id: 'anthropic/claude-sonnet-4.6',
-  label: 'Claude Sonnet 4.6',
-}
+export const REASONERS = [
+  { id: 'qwen/qwen3.7-plus', label: 'Qwen3.7 Plus' },
+  { id: 'anthropic/claude-sonnet-4.6', label: 'Claude Sonnet 4.6' },
+]
 
-export const PROMPT_VERSION = 'v1'
+export const PROMPT_VERSION = 'v2'
 
 // Left-to-right order of the four level columns.
 export const LEVELS = [

@@ -45,9 +45,28 @@ body {
 
 /* ---------- header ---------- */
 
-.site-head { border-bottom: 1px solid var(--rule); padding-bottom: 20px; margin-bottom: 24px; }
+/* .site-head { border-bottom: 1px solid var(--rule); padding-bottom: 20px; margin-bottom: 24px; }
+.site-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
+.site-head p { margin: 0; max-width: 74ch; color: var(--ink-soft); } */
+/* .site-head {
+  display: flex; align-items: center; gap: 32px; justify-content: space-between;
+  border-bottom: 1px solid var(--rule); padding-bottom: 20px; margin-bottom: 24px;
+}
+.head-text { flex: 1; min-width: 0; }
 .site-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
 .site-head p { margin: 0; max-width: 74ch; color: var(--ink-soft); }
+.head-logo { flex: none; height: 175px; width: auto; display: block; }
+
+@media (max-width: 700px) {
+  .site-head { flex-direction: column; align-items: flex-start; gap: 16px; }
+} */
+.site-head {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 20px; margin-bottom: 24px;
+  text-align: center;
+}
+.site-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
+.site-head p { margin: 0 auto; max-width: 74ch; color: var(--ink-soft); }
 
 /* ---------- setup row ---------- */
 
@@ -110,7 +129,11 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ---------- toggle ---------- */
 
-.toggle-bar { display: flex; justify-content: center; margin: 30px 0 22px; }
+.toggle-bar {
+  display: flex; justify-content: center; align-items: center;
+  gap: 10px; margin: 30px 0 22px;
+}
+.toggle-bar .info .tip { left: -150px; width: 380px; }
 .toggle { display: inline-flex; border: 1px solid var(--ink); }
 .toggle button {
   background: var(--paper); color: var(--ink-soft); border: none;
@@ -321,3 +344,21 @@ td.flip { border-left: 1px solid var(--rule); }
 }
 /* tooltips inside the narrow right panel open leftwards so they stay on screen */
 .stat2-name .info .tip { left: auto; right: -8px; width: 300px; }
+
+/* ---------- contrast view ---------- */
+
+.lvlchip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; }
+.lvlchip i { width: 11px; height: 11px; flex: none; display: inline-block; }
+.lvlchip i.ru { background: var(--lvl-ru); }
+.lvlchip i.du { background: var(--lvl-du); }
+.lvlchip i.ds { background: var(--lvl-ds); }
+.lvlchip i.rs { background: var(--lvl-rs); }
+.lvlchip b { font-weight: 400; color: var(--block-2); font-size: 13px; }
+
+tr.disagree td:first-child { box-shadow: inset 3px 0 0 var(--block-2); }
+
+.side-block + .side-block { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.side-block h5 {
+  margin: 0 0 10px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--ink-soft);
+}

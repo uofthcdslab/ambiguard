@@ -1,13 +1,31 @@
 export default function Header() {
   return (
     <header className="site-head">
-      <h1>Ambiguity in Guardrails</h1>
+      <h1>Reflective Evaluation of AI Safety Guardrails</h1>
       <p>
-        Guardrail models are evaluated as if safety labels were measurements. Many are
-        contested judgments. This sandbox reconstructs a guardrail's verdict as a
-        defeasible argument, surfaces the assumption that would make the opposite verdict
-        reasonable, and re-runs the guard to show how it behaves when the label is open.
+        Guardrail models are evaluated as if safety labels are determinate. Many are
+        contested judgments that rely on unstated assumptions. This sandbox reconstructs a
+        guardrail's verdict as a defeasible argument, surfaces an assumption that would
+        make the opposite verdict reasonable, and re-runs the guard to show how it behaves.
       </p>
     </header>
   )
 }
+// import { BASE } from '../config.js'
+
+// export default function Header() {
+//   return (
+//     <header className="site-head">
+//       <div className="head-text">
+//         <h1>Reflective Evaluation of AI Safety Guardrails</h1>
+//         <p>
+//           Guardrail models are evaluated as if safety labels are determinate. Many are
+//           contested judgments that rely on unstated assumptions. This sandbox reconstructs a
+//           guardrail's verdict as a defeasible argument, surfaces the assumption that would
+//           make the opposite verdict reasonable, and re-runs the guard to show how it behaves.
+//         </p>
+//       </div>
+//       <img className="head-logo" src={`${BASE}logo.png`} alt="" />
+//     </header>
+//   )
+// }

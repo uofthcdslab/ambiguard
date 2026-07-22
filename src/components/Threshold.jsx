@@ -15,13 +15,6 @@ export default function Threshold({ value, setValue, enabled }) {
         onChange={(e) => setValue(Number(e.target.value))}
         aria-label="Block threshold"
       />
-      {!enabled && (
-        <p className="note" style={{ marginTop: 8 }}>
-          This guard returns a label, not a score, so there is nothing to threshold. The
-          control is shown because it is the standard one, and disabled because it would
-          have no effect.
-        </p>
-      )}
     </div>
   )
 }

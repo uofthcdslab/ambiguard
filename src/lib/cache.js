@@ -1,10 +1,10 @@
-import { BASE, PROMPT_VERSION, REASONER } from '../config.js'
+import { BASE, PROMPT_VERSION } from '../config.js'
 
 // Must produce byte-identical output to cache_key() in scripts/run_precompute.py.
 // Any drift here silently turns every cache hit into a live API call.
-export async function cacheKey(text, guardId) {
+export async function cacheKey(text, guardId, reasonerId) {
   const normalised = text.trim().replace(/\s+/g, ' ')
-  const raw = [normalised, guardId, REASONER.id, PROMPT_VERSION].join('|')
+  const raw = [normalised, guardId, reasonerId, PROMPT_VERSION].join('|')
   const bytes = new TextEncoder().encode(raw)
   const digest = await crypto.subtle.digest('SHA-256', bytes)
   return Array.from(new Uint8Array(digest))
@@ -24,8 +24,8 @@ export function loadIndex() {
   return indexPromise
 }
 
-export async function lookup(text, guardId) {
-  const key = await cacheKey(text, guardId)
+export async function lookup(text, guardId, reasonerId) {
+  const key = await cacheKey(text, guardId, reasonerId)
   const index = await loadIndex()
   if (!index[key]) return null
   try {

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LEVELS } from '../config.js'
+import { LEVELS, REASONERS } from '../config.js'
 import {
   action, defeasibility, correctButContestable, movement, consistency,
 } from '../lib/metrics.js'
@@ -55,6 +55,7 @@ function Stat({ name, desc, hint, s }) {
 
 export default function AmbiguityView({
   rows, threshold, setThreshold, sliderEnabled, levels, setLevels, acked, setAcked,
+  reasonerId, setReasonerId,
 }) {
   const [open, setOpen] = useState(null)
 
@@ -136,6 +137,19 @@ export default function AmbiguityView({
 
       <aside className="side">
         <div className="panel">
+          <div className="field" style={{ marginBottom: 14 }}>
+            <label htmlFor="reasoner">Reasoning model</label>
+            <select
+              id="reasoner"
+              value={reasonerId}
+              onChange={(e) => setReasonerId(e.target.value)}
+            >
+              {REASONERS.map((r) => (
+                <option key={r.id} value={r.id}>{r.label}</option>
+              ))}
+            </select>
+          </div>
+
           <Threshold value={threshold} setValue={setThreshold} enabled={sliderEnabled} />
 
           <Stat
@@ -144,12 +158,14 @@ export default function AmbiguityView({
             desc="Share of the guard's predictions that are defeasible, split by the direction it predicted."
             hint="Defeasible means a plausible assumption exists under which the opposite verdict is the reasonable one. It is a property of the prediction, not a measure of how wrong the guard is."
           />
-          <Stat
-            name="Correct but contestable"
-            s={c}
-            desc="Of the instances matching the gold label, the share tagged defeasible — and the same where they did not match."
-            hint="Shown only when the selection has ground truth. For the second number, 'defeasible' describes the guard's own mistaken verdict rather than the gold label."
-          />
+          {c.available && (
+            <Stat
+              name="Correct but contestable"
+              s={c}
+              desc="Of the instances matching the gold label, the share tagged defeasible — and the same where they did not match."
+              hint="Shown only when the selection has ground truth. For the second number, 'defeasible' describes the guard's own mistaken verdict rather than the gold label."
+            />
+          )}
           <Stat
             name="Movement"
             s={m}

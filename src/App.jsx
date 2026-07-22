@@ -4,23 +4,31 @@ import DataPanel from './components/DataPanel.jsx'
 import ModelPanel from './components/ModelPanel.jsx'
 import StandardView from './components/StandardView.jsx'
 import AmbiguityView from './components/AmbiguityView.jsx'
-import { GUARDS, MAX_LIVE_INSTANCES } from './config.js'
+import ContrastView from './components/ContrastView.jsx'
+import { GUARDS, REASONERS, MAX_LIVE_INSTANCES } from './config.js'
 import { lookup } from './lib/cache.js'
 import { runInstance } from './lib/pipeline.js'
 
+// Live-run records are keyed by what actually identifies them, not by row
+// position, so they survive changing the guard or reasoner and can be shared
+// with the Comparison view.
+export function liveKey(text, guardId, reasonerId) {
+  return [text.trim().replace(/\s+/g, ' '), guardId, reasonerId].join('|')
+}
+
 export default function App() {
-  // Two independent sources. Changing the category replaces sampleRows only;
-  // anything the practitioner typed or uploaded survives.
   const [sampleRows, setSampleRows] = useState([])
   const [userRows, setUserRows] = useState([])
   const [selected, setSelected] = useState(new Set())
 
   const [guardId, setGuardId] = useState(GUARDS[0].id)
+  const [reasonerId, setReasonerId] = useState(REASONERS[0].id)
   const [apiKey, setApiKey] = useState('')
 
   const [view, setView] = useState('standard')
   const [threshold, setThreshold] = useState(0.5)
-  const [records, setRecords] = useState({})
+  const [resolved, setResolved] = useState({})   // rowId -> record, current settings
+  const [live, setLive] = useState({})           // liveKey -> record, every setting
   const [levels, setLevels] = useState({})
   const [acked, setAcked] = useState({})
   const [status, setStatus] = useState(null)
@@ -37,31 +45,30 @@ export default function App() {
     return all.filter((r) => selected.has(r.id))
   }, [sampleRows, userRows, selected])
 
-  // Instances are keyed by text, so the resolution key is the text list.
   const activeKey = active.map((r) => r.instance).join('\u0000')
 
   useEffect(() => {
     let cancelled = false
-    if (!active.length) { setRecords({}); setStatus(null); return }
+    if (!active.length) { setResolved({}); setStatus(null); return }
     setStatus('Loading precomputed results')
-    Promise.all(active.map(async (row) => [row.id, await lookup(row.instance, guardId)]))
-      .then((pairs) => {
-        if (cancelled) return
-        const next = {}
-        for (const [id, rec] of pairs) if (rec) next[id] = rec
-        setRecords(next)
-        const missing = pairs.filter(([, rec]) => !rec).length
-        setStatus(
-          missing === 0
-            ? null
-            : `${missing} of ${pairs.length} selected instances are not precomputed for this guard.`,
-        )
-      })
+    Promise.all(active.map(async (row) => {
+      const l = live[liveKey(row.instance, guardId, reasonerId)]
+      if (l) return [row.id, l]
+      return [row.id, await lookup(row.instance, guardId, reasonerId)]
+    })).then((pairs) => {
+      if (cancelled) return
+      const next = {}
+      for (const [id, rec] of pairs) if (rec) next[id] = rec
+      setResolved(next)
+      const missing = pairs.filter(([, rec]) => !rec).length
+      setStatus(missing === 0 ? null
+        : `${missing} of ${pairs.length} selected instances are not precomputed for this guard and reasoning model.`)
+    })
     return () => { cancelled = true }
-  }, [activeKey, guardId])
+  }, [activeKey, guardId, reasonerId, live])
 
   const merged = active.map((row) => {
-    const rec = records[row.id]
+    const rec = resolved[row.id]
     return {
       ...row,
       record: rec || null,
@@ -72,24 +79,23 @@ export default function App() {
   })
 
   const missing = merged.filter((r) => !r.record)
-  const anyFixture = merged.some((r) => r.record?.fixture)
+
+  function addLive(rec) {
+    setLive((prev) => ({ ...prev, [liveKey(rec.instance, rec.guard, rec.reasoner)]: rec }))
+  }
 
   async function runMissing() {
     if (!apiKey) { setStatus('Enter an OpenRouter API key to run these instances.'); return }
     const todo = missing.slice(0, MAX_LIVE_INSTANCES)
     setBusy(true)
-    const next = { ...records }
     try {
       for (const [i, row] of todo.entries()) {
         const rec = await runInstance({
-          apiKey,
-          guardId,
-          text: row.instance,
+          apiKey, guardId, reasonerId, text: row.instance,
           meta: { safety_type: row.safety_type, ground_truth: row.ground_truth },
           onStage: (s) => setStatus(`Instance ${i + 1} of ${todo.length}: ${s}`),
         })
-        next[row.id] = rec
-        setRecords({ ...next })
+        addLive(rec)
       }
       setStatus(null)
     } catch (err) {
@@ -118,26 +124,34 @@ export default function App() {
       <div className="toggle-bar">
         <div className="toggle" role="group" aria-label="Analysis view">
           <button aria-pressed={view === 'standard'} onClick={() => setView('standard')}>
-            Standard
+          Aggregate
           </button>
-          <button aria-pressed={view === 'ambiguity'} onClick={() => setView('ambiguity')}>
-            Ambiguity
+          <button aria-pressed={view === 'individual'} onClick={() => setView('individual')}>
+          Assumptions
+          </button>
+          <button aria-pressed={view === 'contrast'} onClick={() => setView('contrast')}>
+          Divergence
           </button>
         </div>
+        <span className="info" tabIndex={0} role="button" aria-label="About the three views">
+          i
+          <span className="tip">
+          <b>Aggregate</b> — the guard's decision on each instance, with the standard
+            aggregate scores.
+            <br /><br />
+            <b>Assumptions</b> — the same instances, each marked by whether the guard's
+            call holds up once a plausible opposing assumption is made explicit.
+            <br /><br />
+            <b>Divergence</b> — the same instances under two settings side by side: two
+            reasoning models on one guard, or two guards under one reasoning model.
+          </span>
+        </span>
       </div>
-
-      {anyFixture && (
-        <div className="banner warn">
-          <b>Placeholder reconstructions.</b> Some rows are shipped fixtures, not real model
-          output. Run <code>scripts/run_precompute.py</code> and replace{' '}
-          <code>public/precomputed/</code> before showing this to a participant.
-        </div>
-      )}
 
       {status && (
         <div className="banner">
           {status}
-          {missing.length > 0 && !busy && (
+          {missing.length > 0 && !busy && view !== 'contrast' && (
             <button
               className="secondary"
               style={{ marginLeft: 10, padding: '3px 10px' }}
@@ -151,7 +165,7 @@ export default function App() {
 
       {merged.length === 0 ? (
         <div className="empty">
-          Load a sample set, or add your own instances, then tick the ones you want.
+          Load a sample set, or add your own instances, then select the evaluation mode.
         </div>
       ) : view === 'standard' ? (
         <StandardView
@@ -159,13 +173,23 @@ export default function App() {
           threshold={threshold} setThreshold={setThreshold}
           sliderEnabled={sliderEnabled}
         />
-      ) : (
+      ) : view === 'individual' ? (
         <AmbiguityView
           rows={merged}
           threshold={threshold} setThreshold={setThreshold}
           sliderEnabled={sliderEnabled}
           levels={levels} setLevels={setLevels}
           acked={acked} setAcked={setAcked}
+          reasonerId={reasonerId} setReasonerId={setReasonerId}
+        />
+      ) : (
+        <ContrastView
+          rows={merged}
+          guardId={guardId}
+          reasonerId={reasonerId}
+          live={live}
+          addLive={addLive}
+          apiKey={apiKey}
         />
       )}
     </div>

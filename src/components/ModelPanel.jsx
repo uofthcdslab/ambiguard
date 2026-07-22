@@ -1,4 +1,4 @@
-import { GUARDS, REASONER } from '../config.js'
+import { GUARDS } from '../config.js'
 
 export default function ModelPanel({ guardId, setGuardId, apiKey, setApiKey }) {
   return (
@@ -6,7 +6,7 @@ export default function ModelPanel({ guardId, setGuardId, apiKey, setApiKey }) {
       <h2>Guardrail model</h2>
 
       <div className="field">
-        <label htmlFor="guard">Guard (G)</label>
+        <label htmlFor="guard">Guard</label>
         <select id="guard" value={guardId} onChange={(e) => setGuardId(e.target.value)}>
           {GUARDS.map((g) => (
             <option key={g.id} value={g.id}>{g.label}</option>
@@ -28,14 +28,12 @@ export default function ModelPanel({ guardId, setGuardId, apiKey, setApiKey }) {
           onChange={(e) => setApiKey(e.target.value)}
         />
         <p className="note">
-          Held in memory for this tab only. Never saved to the browser, never sent anywhere
-          except OpenRouter, and cleared when you reload the page.
+          Only needed for instances that are not already precomputed. The key is kept in
+          this tab's memory, is never saved to the browser, and is cleared on reload — but
+          it is <b>still present</b> in the page while you are using it, so anything with access
+          to this browser can read it.
         </p>
       </div>
-
-      <p className="note">
-        Reconstructions use {REASONER.label} as the reasoning model (A).
-      </p>
     </section>
   )
 }
