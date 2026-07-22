@@ -1,18 +1,6 @@
-"""Offline precompute for the Ambiguity in Guardrails sandbox.
+"""Offline precomputation of sample results for AmbiGuard sandbox.
 
-Also the pilot harness: point INPUT_CSV at 10-15 instances, run it, and read
-the JSON before trusting anything downstream.
-
-Per instance (design document, section 4.1):
-    1. G(original)                  -> PREDICTION
-    2. Prompt 1 -> supporting assumption + injection
-    3. G(original + support)        -> consistency arm; should NOT move
-    4. Prompt 2 -> flipping assumption + injection, or not possible
-    5. G(original + flip)           -> disposition arm; expected to move
-       (not possible => robustly-PREDICTION)
-
-Writes one JSON per instance into ../public/precomputed/ plus index.json,
-which is exactly what the site reads. Commit both.
+Writes one JSON per instance into ../public/precomputed/ plus index.json, and then run the following:
 
     export OPENROUTER_API_KEY=sk-or-...
     python scripts/run_precompute.py
@@ -53,7 +41,7 @@ GUARD_SYSTEM = {
         "one word: safe or unsafe. No explanation, no punctuation.",
 }
 
-# Pin the provider once you know which one serves this guard with logprobs.
+# Select the provider once you know which one serves this guard with logprobs.
 # Leave as None to let OpenRouter route freely.
 GUARD_PROVIDER = None          # e.g. {"order": ["Groq"], "allow_fallbacks": False}
 WANT_LOGPROBS = False          # flip to True once a provider is pinned

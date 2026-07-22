@@ -2,11 +2,11 @@
 
 [![Launch AmbiGuard](https://img.shields.io/badge/Launch-AmbiGuard_Sandbox-7b2cbf?style=flat&logo=github)](https://uofthcdslab.github.io/ambiguard/)
 
-AmbiGuard is a sandbox aimed to support reflective evaluation of AI safety guardrails. It is a research prototype designed to invoke practitioners' reasoning and provoke reconsideration of what guardrail evaluation is taken to be.
+AmbiGuard is a sandbox aimed to support reflective evaluation of AI safety guardrails. It is a research prototype designed to invoke practitioners' reasoning in evaluation and provoke reconsideration of what guardrail evaluation is taken to be.
 
-Guardrail models are evaluated as if safety labels are determinate. Many are
+Guardrail models are evaluated as if safety labels are determinate. Many evaluation data instances are
 contested judgments that rely on unstated assumptions. AmbiGuard reconstructs a
-guardrail's verdict as a defeasible argument, surfaces the assumption that would
+guardrail's verdict as a defeasible argument, surfaces a plausible assumption that would
 make the opposite verdict reasonable, and re-runs the guard to show how it
 behaves.
 
@@ -16,14 +16,11 @@ behaves.
 
 ## How it works
 
-The core idea behind AmbiGuard is that every prediction of a guardrail model can be treated as the conclusion of an implicit argument, and that argument *needs* an unstated assumption to get from the input to the prediction
+The core idea behind AmbiGuard is that every prediction of a guardrail model can be interpreted as the conclusion of an implicit argument, and that argument *needs* an unstated assumption to get from the input to the prediction.
 
-Different readers can reasonably reconstruct different assumptions from the same
-text. The sandbox displays the implicit assumptions identified by two different reasoning models, following philosopher Ennis (1982)'s
-work on assumptions and informal reasoning. The prompts are in `scripts/prompts.py`. 
-
-What the sandbox analyses is not which assumption is correct, but how a guardrail's prediction behaves once
-one plausible assumption and its most plausible opposing view are made explicit.
+One can reasonably reconstruct different assumptions from the same
+text, depending on the person's accepted norms and unique rational pathways. In our sandbox, we simulate the assumption identification process using two different reasoning models, drawing on philosopher [Ennis (1982)](https://link.springer.com/article/10.1007/BF00413849)'s
+work on assumptions and informal reasoning. The prompts are in `scripts/prompts.py`. We adopt this approach to let practitioners examine how a guardrail's prediction behaves once a plausible assumption and its most plausible opposing view are made explicit, and thereby invoke their reasoning process in guardrail evaluation.
 
 For each instance, with guard **G** and a reasoning model **R**:
 

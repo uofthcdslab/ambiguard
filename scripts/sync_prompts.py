@@ -1,6 +1,6 @@
 """Regenerate src/lib/prompts.js from scripts/prompts.py.
 
-scripts/prompts.py is the single source of truth for prompt text. Edit it,
+scripts/prompts.py has the prompt text that will be used to call the reasoning models. Edit that if needed,
 then run:
 
     python scripts/sync_prompts.py

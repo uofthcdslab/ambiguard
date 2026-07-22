@@ -1,8 +1,6 @@
 """Prompts to A.
 
-These are SYSTEM prompts; the instance, the prediction, and (for Prompt 2) the
-assumption from Prompt 1 are supplied in the user message by the builders at
-the bottom.
+These are SYSTEM prompts for the two calls to reasoning models.
 
 src/lib/prompts.js must hold identical text. If you edit either, bump
 PROMPT_VERSION in BOTH scripts/run_precompute.py and src/config.js, or the
