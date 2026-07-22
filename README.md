@@ -1,6 +1,5 @@
 # AmbiGuard
 
-[![Open the sandbox](https://img.shields.io/badge/open-uofthcdslab.github.io%2FAmbiGuard-1f6feb?style=for-the-badge)](https://uofthcdslab.github.io/AmbiGuard/)
 [![Launch AmbiGuard](https://img.shields.io/badge/Launch-AmbiGuard_Sandbox-7b2cbf?style=flat&logo=github)](https://uofthcdslab.github.io/AmbiGuard/)
 
 AmbiGuard is a sandbox aimed to support reflective evaluation of AI safety guardrails. It is a research prototype designed to invoke practitioners' reasoning and provoke reconsideration of what guardrail evaluation is taken to be.
