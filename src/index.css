@@ -65,8 +65,20 @@ body {
   padding-bottom: 20px; margin-bottom: 24px;
   text-align: center;
 }
-.site-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
+/* .site-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; } */
 .site-head p { margin: 0 auto; max-width: 74ch; color: var(--ink-soft); }
+.site-head a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+
+.repo-line { display: block; margin-top: 10px; }
+
+.brand {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+.site-head h1 {
+  font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px;
+}
 
 /* ---------- setup row ---------- */
 
@@ -362,3 +374,12 @@ tr.disagree td:first-child { box-shadow: inset 3px 0 0 var(--block-2); }
   margin: 0 0 10px; font-size: 11px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.08em; color: var(--ink-soft);
 }
+
+.site-foot {
+  margin-top: 60px; padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+.site-foot p { margin: 0; }
+.site-foot .authors { font-size: 13px; color: var(--ink-soft); }
+.site-foot .affil { font-size: 12px; color: var(--ink-faint); margin-top: 4px; }

@@ -8,6 +8,7 @@ import ContrastView from './components/ContrastView.jsx'
 import { GUARDS, REASONERS, MAX_LIVE_INSTANCES } from './config.js'
 import { lookup } from './lib/cache.js'
 import { runInstance } from './lib/pipeline.js'
+import Footer from './components/Footer.jsx'
 
 // Live-run records are keyed by what actually identifies them, not by row
 // position, so they survive changing the guard or reasoner and can be shared
@@ -192,6 +193,7 @@ export default function App() {
           apiKey={apiKey}
         />
       )}
+      <Footer />
     </div>
   )
 }
